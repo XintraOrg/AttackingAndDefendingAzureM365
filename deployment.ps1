@@ -702,6 +702,19 @@ function Ensure-AzModulesAndLogin {
             }
         }
 
+        $providerFeatures = @(
+            @{ namespace = "Microsoft.Compute"; feature = "UseStandardSecurityType" }
+        )
+
+        Write-Host "Ensuring provider features are registered..." -ForegroundColor Cyan
+        foreach ($feature in $providerFeatures) {
+            $registration = Get-AzProviderFeature -ProviderNamespace $feature.namespace -FeatureName $feature.feature
+            if ($registration.RegistrationState -ne "Registered") {
+                Write-Host "Registering provider feature: $($feature.namespace).$($feature.feature)" -ForegroundColor Gray
+                Register-AzProviderFeature -ProviderNamespace $feature.namespace -FeatureName $feature.feature | Out-Null
+            }
+        }
+
         Write-Verbose "Azure modules and authentication ready"
     }
     catch {
