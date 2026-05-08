@@ -1589,10 +1589,20 @@ function Deploy-LinuxVM {
         [Parameter(Mandatory)]$Subnet
     )
     
-    # Create Public IP and NIC for Linux VM
-    $linuxPip = New-AzPublicIpAddress -Name ($LinuxVmName + "-pip") -ResourceGroupName $ResourceGroupName -Location $AzureLocation -AllocationMethod Static -Sku Standard
-    $linuxNic = New-AzNetworkInterface -Name ($LinuxVmName + "-nic") -ResourceGroupName $ResourceGroupName -Location $AzureLocation -SubnetId $Subnet.Id -PublicIpAddressId $linuxPip.Id
+    # Create or get existing Public IP for Linux VM
+    $linuxPipName = $LinuxVmName + "-pip"
+    $linuxNicName = $LinuxVmName + "-nic"
+    $linuxPip = Get-AzPublicIpAddress -Name $linuxPipName -ResourceGroupName $ResourceGroupName -ErrorAction SilentlyContinue
+    if (-not $linuxPip) {
+        $linuxPip = New-AzPublicIpAddress -Name $linuxPipName -ResourceGroupName $ResourceGroupName -Location $AzureLocation -AllocationMethod Static -Sku Standard
+    }
 
+    # Create or get existing NIC for Linux VM
+    $linuxNic = Get-AzNetworkInterface -Name $linuxNicName -ResourceGroupName $ResourceGroupName -ErrorAction SilentlyContinue
+    if (-not $linuxNic) {
+        $linuxNic = New-AzNetworkInterface -Name $linuxNicName -ResourceGroupName $ResourceGroupName -Location $AzureLocation -SubnetId $Subnet.Id -PublicIpAddressId $linuxPip.Id
+    }
+    
     # Linux VM (Ubuntu 22.04 LTS Gen2), system assigned identity (with password authentication for lab purposes)
     try {
         $linuxCred = New-Object System.Management.Automation.PSCredential($LinuxAdminUser,(ConvertTo-SecureString (New-StrongPassword) -AsPlainText -Force))
@@ -1724,10 +1734,19 @@ function Deploy-WindowsVM {
     $windowsImage = Get-AvailableWindowsImage -AzureLocation $AzureLocation
     Write-Host "Using image: $($windowsImage.Name)" -ForegroundColor Cyan
     
-    # Create Public IP and NIC for Windows VM
-    $winPip = New-AzPublicIpAddress -Name ($WindowsVmName + "-pip") -ResourceGroupName $ResourceGroupName -Location $AzureLocation -AllocationMethod Static -Sku Standard
-    $winNic = New-AzNetworkInterface -Name ($WindowsVmName + "-nic") -ResourceGroupName $ResourceGroupName -Location $AzureLocation -SubnetId $Subnet.Id -PublicIpAddressId $winPip.Id
-
+    # Create or get existing Public IP for Windows VM
+    $winPipName = $WindowsVmName + "-pip"
+    $winNicName = $WindowsVmName + "-nic"
+    $winPip = Get-AzPublicIpAddress -Name $winPipName -ResourceGroupName $ResourceGroupName -ErrorAction SilentlyContinue
+    if (-not $winPip) {
+        $winPip = New-AzPublicIpAddress -Name $winPipName -ResourceGroupName $ResourceGroupName -Location $AzureLocation -AllocationMethod Static -Sku Standard
+    }
+    # Create or get existing NIC for Windows VM
+    $winNic = Get-AzNetworkInterface -Name $winNicName -ResourceGroupName $ResourceGroupName -ErrorAction SilentlyContinue
+    if (-not $winNic) {
+        $winNic = New-AzNetworkInterface -Name $winNicName -ResourceGroupName $ResourceGroupName -Location $AzureLocation -SubnetId $Subnet.Id -PublicIpAddressId $winPip.Id
+    }
+    
     # Windows VM with system assigned identity
     try {
         $winCred = New-Object System.Management.Automation.PSCredential($WindowsAdminUser,(ConvertTo-SecureString (New-StrongPassword) -AsPlainText -Force))
