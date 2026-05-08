@@ -97,7 +97,7 @@ ssh-keygen --help
 Connect-AzAccount
 
 # Connect to Microsoft Graph with required scopes
-Connect-MgGraph -Scopes "Application.ReadWrite.All","Directory.ReadWrite.All","User.ReadWrite.All","Group.ReadWrite.All","RoleManagement.ReadWrite.Directory","Policy.ReadWrite.ApplicationConfiguration"
+Connect-MgGraph -Scopes "Application.ReadWrite.All","Directory.ReadWrite.All","User.ReadWrite.All","Group.ReadWrite.All","RoleManagement.ReadWrite.Directory","Policy.ReadWrite.ApplicationConfiguration","AppRoleAssignment.ReadWrite.All"
 
 # Verify connections
 Get-AzContext
