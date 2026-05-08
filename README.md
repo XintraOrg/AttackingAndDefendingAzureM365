@@ -146,8 +146,8 @@ Install-Module -Name Microsoft.Graph.Beta -Force -AllowClobber -Scope CurrentUse
 **Run the automated deployment:**
 ```powershell
 # Clone repository (if not already done)
-git clone https://github.com/ExeqZ/xintra-m365-templates.git
-cd xintra-m365-templates
+git clone https://github.com/XintraOrg/AttackingAndDefendingAzureM365.git
+cd AttackingAndDefendingAzureM365
 
 # Run deployment script
 .\deployment.ps1 `
